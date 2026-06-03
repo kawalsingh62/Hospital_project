@@ -15,7 +15,7 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "csv_to_sql",
+							"name": "csv_to_sql_hospa",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -85,6 +85,78 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "csv_to_sql_hospb",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_adls_csv",
+									"type": "DatasetReference",
+									"parameters": {
+										"hospital": {
+											"value": "@pipeline().parameters.pp_hospital_b",
+											"type": "Expression"
+										},
+										"csvFile": {
+											"value": "@concat(item(),'.csv')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_sql_db",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@pipeline().parameters.Schema_b",
+											"type": "Expression"
+										},
+										"table": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								}
+							]
 						}
 					]
 				}
@@ -94,10 +166,6 @@
 			"pp_hospital": {
 				"type": "String",
 				"defaultValue": "HospitalA"
-			},
-			"pp_csvFile": {
-				"type": "string",
-				"defaultValue": "ss"
 			},
 			"CSV_Array": {
 				"type": "array",
@@ -112,6 +180,14 @@
 			"Schema": {
 				"type": "string",
 				"defaultValue": "hospa"
+			},
+			"pp_hospital_b": {
+				"type": "string",
+				"defaultValue": "HospitalB"
+			},
+			"Schema_b": {
+				"type": "string",
+				"defaultValue": "hospb"
 			}
 		},
 		"annotations": [],
