@@ -1,0 +1,15 @@
+{
+	"name": "hospitalDataFactorySumit",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "centralus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "d188e2b2-a171-4b42-ac82-3f91f58ab53a",
+		"tenantId": "b97d8520-4256-4533-ab13-d9120efde0b1"
+	}
+}
