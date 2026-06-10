@@ -56,7 +56,11 @@
 				"outputs": [
 					{
 						"referenceName": "ds_sql_db",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"ds_p_schema": "dbo",
+							"ds_p_table": "config"
+						}
 					}
 				]
 			}
