@@ -74,11 +74,11 @@
 									"referenceName": "ds_sql_db",
 									"type": "DatasetReference",
 									"parameters": {
-										"schema": {
-											"value": "@pipeline().parameters.Schema",
+										"ds_p_schema": {
+											"value": "@pipeline().parameters.pp_hospital",
 											"type": "Expression"
 										},
-										"table": {
+										"ds_p_table": {
 											"value": "@item()",
 											"type": "Expression"
 										}
@@ -144,17 +144,7 @@
 							"outputs": [
 								{
 									"referenceName": "ds_sql_db",
-									"type": "DatasetReference",
-									"parameters": {
-										"schema": {
-											"value": "@pipeline().parameters.Schema_b",
-											"type": "Expression"
-										},
-										"table": {
-											"value": "@item()",
-											"type": "Expression"
-										}
-									}
+									"type": "DatasetReference"
 								}
 							]
 						}

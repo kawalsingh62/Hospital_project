@@ -48,19 +48,15 @@
 						"referenceName": "ds_adls_csv",
 						"type": "DatasetReference",
 						"parameters": {
-							"hospital": "ss",
-							"csvFile": "ss"
+							"hospital": "'ss'",
+							"csvFile": "'ss'"
 						}
 					}
 				],
 				"outputs": [
 					{
 						"referenceName": "ds_sql_db",
-						"type": "DatasetReference",
-						"parameters": {
-							"schema": "dbo",
-							"table": "config"
-						}
+						"type": "DatasetReference"
 					}
 				]
 			}
