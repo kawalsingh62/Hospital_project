@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup_config",
+				"name": "config",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -24,19 +24,19 @@
 						"referenceName": "ds_sql_db",
 						"type": "DatasetReference",
 						"parameters": {
-							"schema": "dbo",
-							"table": "config"
+							"ds_p_schema": "dbo",
+							"ds_p_table": "config"
 						}
 					},
 					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "ForEachFile",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup_config",
+						"activity": "config",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -45,13 +45,51 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup_config').output.value",
+						"value": "@activity('config').output.value",
 						"type": "Expression"
 					},
-					"isSequential": true,
 					"activities": [
 						{
-							"name": "archive",
+							"name": "FileExists",
+							"type": "GetMetadata",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_adls_parquet",
+									"type": "DatasetReference",
+									"parameters": {
+										"ds_p_folder_name": {
+											"value": "@concat('EMR/',item().targetpath)",
+											"type": "Expression"
+										},
+										"ds_p_filename": {
+											"value": "@item().tablename",
+											"type": "Expression"
+										}
+									}
+								},
+								"fieldList": [
+									"exists"
+								],
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							}
+						},
+						{
+							"name": "IfFileExists",
 							"type": "IfCondition",
 							"dependsOn": [
 								{
@@ -69,7 +107,7 @@
 								},
 								"ifTrueActivities": [
 									{
-										"name": "Archive",
+										"name": "archive",
 										"type": "Copy",
 										"dependsOn": [],
 										"policy": {
@@ -85,7 +123,7 @@
 												"type": "ParquetSource",
 												"storeSettings": {
 													"type": "AzureBlobFSReadSettings",
-													"recursive": false,
+													"recursive": true,
 													"enablePartitionDiscovery": false
 												},
 												"formatSettings": {
@@ -116,11 +154,11 @@
 												"referenceName": "ds_adls_parquet",
 												"type": "DatasetReference",
 												"parameters": {
-													"p_folder_path": {
+													"ds_p_folder_name": {
 														"value": "@concat('EMR/',item().targetpath)",
 														"type": "Expression"
 													},
-													"p_file_name": "@item().tablename"
+													"ds_p_filename": "@item().tablename"
 												}
 											}
 										],
@@ -129,11 +167,11 @@
 												"referenceName": "ds_adls_parquet",
 												"type": "DatasetReference",
 												"parameters": {
-													"p_folder_path": {
-														"value": "@concat('EMR/',item().targetpath,'/archive/',formatDateTime(utcNow(),'yyyy'),'/',formatDateTime(utcNow(),'MM'),'/',formatDateTime(utcNow(),'dd'))",
+													"ds_p_folder_name": {
+														"value": "@concat('EMR/',item().targetpath,'/archive/',formatDateTime(utcNow(),'yyyy'),'/',formatDateTime(utcNow(),'%M'),'/',formatDateTime(utcNow(),'%d'))",
 														"type": "Expression"
 													},
-													"p_file_name": {
+													"ds_p_filename": {
 														"value": "@item().tablename",
 														"type": "Expression"
 													}
@@ -145,51 +183,11 @@
 							}
 						},
 						{
-							"name": "FileExists",
-							"type": "GetMetadata",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"dataset": {
-									"referenceName": "ds_adls_parquet",
-									"type": "DatasetReference",
-									"parameters": {
-										"p_folder_path": {
-											"value": "@concat('EMR/',item().targetpath)",
-											"type": "Expression"
-										},
-										"p_file_name": {
-											"value": "@concat(item().tablename)",
-											"type": "Expression"
-										}
-									}
-								},
-								"fieldList": [
-									"exists"
-								],
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "ParquetReadSettings"
-								}
-							}
-						},
-						{
-							"name": "copy",
+							"name": "IfLoadType",
 							"type": "IfCondition",
 							"dependsOn": [
 								{
-									"activity": "archive",
+									"activity": "IfFileExists",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -203,82 +201,7 @@
 								},
 								"ifFalseActivities": [
 									{
-										"name": "Copy_Incremental_Load",
-										"type": "Copy",
-										"dependsOn": [
-											{
-												"activity": "Lookup1",
-												"dependencyConditions": [
-													"Succeeded"
-												]
-											}
-										],
-										"policy": {
-											"timeout": "0.12:00:00",
-											"retry": 0,
-											"retryIntervalInSeconds": 30,
-											"secureOutput": false,
-											"secureInput": false
-										},
-										"userProperties": [],
-										"typeProperties": {
-											"source": {
-												"type": "AzureSqlSource",
-												"sqlReaderQuery": {
-													"value": "@concat('SELECT * FROM ',\n    item().hosp_schema,\n    '.',\n    item().tablename,\n    ' WHERE ',\n    item().watermarkcolumn,\n    ' > ''',\n    activity('Lookup1').output.firstRow.last_fetched_date,\n    ''''\n)",
-													"type": "Expression"
-												},
-												"queryTimeout": "02:00:00",
-												"partitionOption": "None"
-											},
-											"sink": {
-												"type": "ParquetSink",
-												"storeSettings": {
-													"type": "AzureBlobFSWriteSettings"
-												},
-												"formatSettings": {
-													"type": "ParquetWriteSettings"
-												}
-											},
-											"enableStaging": false,
-											"translator": {
-												"type": "TabularTranslator",
-												"typeConversion": true,
-												"typeConversionSettings": {
-													"allowDataTruncation": true,
-													"treatBooleanAsNumber": false
-												}
-											}
-										},
-										"inputs": [
-											{
-												"referenceName": "ds_sql_db",
-												"type": "DatasetReference",
-												"parameters": {
-													"schema": "aa",
-													"table": "aa"
-												}
-											}
-										],
-										"outputs": [
-											{
-												"referenceName": "ds_adls_parquet",
-												"type": "DatasetReference",
-												"parameters": {
-													"p_folder_path": {
-														"value": "@concat('EMR/',item().targetpath)",
-														"type": "Expression"
-													},
-													"p_file_name": {
-														"value": "@item().tablename",
-														"type": "Expression"
-													}
-												}
-											}
-										]
-									},
-									{
-										"name": "Lookup1",
+										"name": "last_fetched_date",
 										"type": "Lookup",
 										"dependsOn": [],
 										"policy": {
@@ -293,7 +216,7 @@
 											"source": {
 												"type": "AzureSqlSource",
 												"sqlReaderQuery": {
-													"value": "@concat(\n'SELECT COALESCE(CAST(MAX(loaddate) AS DATE), ''1990-01-01'') AS last_fetched_date\n FROM dbo.logs\n WHERE tablename = ''',\nitem().hosp_schema,\n'.',\nitem().tablename,\n''''\n)",
+													"value": "@concat(\n    'SELECT COALESCE(CAST(MAX(loaddate) AS DATE), ''1990-01-01'') AS last_fetched_date\n    FROM dbo.logs\n    WHERE tablename = '\n    ,'''',\n    item().hosp_schema,\n    '.',\n    item().tablename,\n    ''''\n    )",
 													"type": "Expression"
 												},
 												"queryTimeout": "02:00:00",
@@ -303,19 +226,94 @@
 												"referenceName": "ds_sql_db",
 												"type": "DatasetReference",
 												"parameters": {
-													"schema": "dbo",
-													"table": "logs"
+													"ds_p_schema": "dbo",
+													"ds_p_table": "logs"
 												}
 											},
-											"firstRowOnly": true
+											"firstRowOnly": false
 										}
 									},
 									{
-										"name": "Stored procedure2",
+										"name": "CopyIncremenetalLoad",
+										"type": "Copy",
+										"dependsOn": [
+											{
+												"activity": "last_fetched_date",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureSqlSource",
+												"sqlReaderQuery": {
+													"value": "@concat('select * from ',\n        item().hosp_schema,\n        '.',\n        item().tablename,\n        ' where ',\n        item().watermark,\n        '>=' ,\n        '''',\n        activity('last_fetched_date').output.value[0].last_fetched_date,\n        '''')",
+													"type": "Expression"
+												},
+												"queryTimeout": "02:00:00",
+												"partitionOption": "None"
+											},
+											"sink": {
+												"type": "ParquetSink",
+												"storeSettings": {
+													"type": "AzureBlobFSWriteSettings"
+												},
+												"formatSettings": {
+													"type": "ParquetWriteSettings"
+												}
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "ds_sql_db",
+												"type": "DatasetReference",
+												"parameters": {
+													"ds_p_schema": "'ss'",
+													"ds_p_table": "'ss'"
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "ds_adls_parquet",
+												"type": "DatasetReference",
+												"parameters": {
+													"ds_p_folder_name": {
+														"value": "@concat('EMR/',item().targetpath)",
+														"type": "Expression"
+													},
+													"ds_p_filename": {
+														"value": "@item().tablename",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									},
+									{
+										"name": "InsertLogs_incremental",
 										"type": "SqlServerStoredProcedure",
 										"dependsOn": [
 											{
-												"activity": "Copy_Incremental_Load",
+												"activity": "CopyIncremenetalLoad",
 												"dependencyConditions": [
 													"Succeeded"
 												]
@@ -334,7 +332,14 @@
 											"storedProcedureParameters": {
 												"data_source": {
 													"value": {
-														"value": "@item().data_source",
+														"value": "@item().datasource",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"hosp_schema": {
+													"value": {
+														"value": "@item().hosp_schema",
 														"type": "Expression"
 													},
 													"type": "String"
@@ -348,7 +353,7 @@
 												},
 												"numberofrowscopied": {
 													"value": {
-														"value": "@activity('Copy_Incremental_Load').output.rowsCopied",
+														"value": "@activity('CopyIncremenetalLoad').output.rowsCopied",
 														"type": "Expression"
 													},
 													"type": "Int32"
@@ -362,14 +367,7 @@
 												},
 												"watermarkcolumn": {
 													"value": {
-														"value": "@item().watermarkcolumn",
-														"type": "Expression"
-													},
-													"type": "String"
-												},
-												"hosp_schema": {
-													"value": {
-														"value": "@item().hosp_schema",
+														"value": "@item().watermark",
 														"type": "Expression"
 													},
 													"type": "String"
@@ -384,7 +382,7 @@
 								],
 								"ifTrueActivities": [
 									{
-										"name": "Copy_full_load",
+										"name": "CopyFullLoad",
 										"type": "Copy",
 										"dependsOn": [],
 										"policy": {
@@ -425,11 +423,11 @@
 												"referenceName": "ds_sql_db",
 												"type": "DatasetReference",
 												"parameters": {
-													"schema": {
+													"ds_p_schema": {
 														"value": "@item().hosp_schema",
 														"type": "Expression"
 													},
-													"table": {
+													"ds_p_table": {
 														"value": "@item().tablename",
 														"type": "Expression"
 													}
@@ -441,12 +439,12 @@
 												"referenceName": "ds_adls_parquet",
 												"type": "DatasetReference",
 												"parameters": {
-													"p_folder_path": {
+													"ds_p_folder_name": {
 														"value": "@concat('EMR/',item().targetpath)",
 														"type": "Expression"
 													},
-													"p_file_name": {
-														"value": "@{item().tablename}",
+													"ds_p_filename": {
+														"value": "@item().tablename",
 														"type": "Expression"
 													}
 												}
@@ -454,11 +452,11 @@
 										]
 									},
 									{
-										"name": "Stored procedure1",
+										"name": "InsertLogs",
 										"type": "SqlServerStoredProcedure",
 										"dependsOn": [
 											{
-												"activity": "Copy_full_load",
+												"activity": "CopyFullLoad",
 												"dependencyConditions": [
 													"Succeeded"
 												]
@@ -477,7 +475,14 @@
 											"storedProcedureParameters": {
 												"data_source": {
 													"value": {
-														"value": "@item().data_source",
+														"value": "@item().datasource",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"hosp_schema": {
+													"value": {
+														"value": "@item().hosp_schema",
 														"type": "Expression"
 													},
 													"type": "String"
@@ -491,7 +496,7 @@
 												},
 												"numberofrowscopied": {
 													"value": {
-														"value": "@activity('Copy_full_load').output.rowsCopied",
+														"value": "@activity('CopyFullLoad').output.rowsCopied",
 														"type": "Expression"
 													},
 													"type": "Int32"
@@ -505,7 +510,7 @@
 												},
 												"watermarkcolumn": {
 													"value": {
-														"value": "@item().watermarkcolumn",
+														"value": "@item().watermark",
 														"type": "Expression"
 													},
 													"type": "String"

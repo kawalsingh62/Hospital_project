@@ -2,15 +2,15 @@
 	"name": "ds_adls_parquet",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage1",
+			"referenceName": "ls_adls",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"p_folder_path": {
-				"type": "string"
+			"ds_p_folder_name": {
+				"type": "String"
 			},
-			"p_file_name": {
-				"type": "string"
+			"ds_p_filename": {
+				"type": "String"
 			}
 		},
 		"annotations": [],
@@ -19,11 +19,11 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": {
-					"value": "@dataset().p_file_name",
+					"value": "@dataset().ds_p_filename",
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "@dataset().p_folder_path",
+					"value": "@dataset().ds_p_folder_name",
 					"type": "Expression"
 				},
 				"fileSystem": "bronze"

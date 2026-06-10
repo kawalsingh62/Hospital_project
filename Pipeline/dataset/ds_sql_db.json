@@ -6,10 +6,10 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"schema": {
+			"ds_p_schema": {
 				"type": "String"
 			},
-			"table": {
+			"ds_p_table": {
 				"type": "String"
 			}
 		},
@@ -18,14 +18,13 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": {
-				"value": "@dataset().schema",
+				"value": "@dataset().ds_p_schema",
 				"type": "Expression"
 			},
 			"table": {
-				"value": "@dataset().table",
+				"value": "@dataset().ds_p_table",
 				"type": "Expression"
 			}
 		}
-	},
-	"type": "Microsoft.DataFactory/factories/datasets"
+	}
 }
