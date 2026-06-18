@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "departments",
+				"name": "Departments_Full_Load",
 				"type": "DatabricksNotebook",
 				"dependsOn": [],
 				"policy": {
@@ -23,7 +23,7 @@
 				}
 			},
 			{
-				"name": "provider",
+				"name": "Providers_Full_Load",
 				"type": "DatabricksNotebook",
 				"dependsOn": [],
 				"policy": {
@@ -35,7 +35,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/Users/naina.wadhawan02_gmail.com#ext#@nainawadhawan02gmail.onmicrosoft.com/Hospital_project/Databricks/silver/Providere_Full_Load"
+					"notebookPath": "/Users/naina.wadhawan02_gmail.com#ext#@nainawadhawan02gmail.onmicrosoft.com/Hospital_project/Databricks/silver/Providers_Full_Load"
 				},
 				"linkedServiceName": {
 					"referenceName": "ls_databricks",
