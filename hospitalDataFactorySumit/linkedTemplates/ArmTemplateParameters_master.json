@@ -11,6 +11,9 @@
 		"ls_adls_accountKey": {
 			"value": ""
 		},
+		"ls_databricks_accessToken": {
+			"value": ""
+		},
 		"ls_sql_db_password": {
 			"value": ""
 		},
@@ -19,6 +22,9 @@
 		},
 		"ls_adls_properties_typeProperties_url": {
 			"value": "https://adlshosptial.dfs.core.windows.net/"
+		},
+		"ls_databricks_properties_typeProperties_existingClusterId": {
+			"value": "0618-152343-8hm64pko"
 		},
 		"ls_key_vault_properties_typeProperties_baseUrl": {
 			"value": "https://hospitalvaultkawal.vault.azure.net/"

@@ -15,6 +15,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'ls_adls'"
 		},
+		"ls_databricks_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'ls_databricks'"
+		},
 		"ls_sql_db_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'ls_sql_db'"
@@ -26,6 +30,10 @@
 		"ls_adls_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://adlshosptial.dfs.core.windows.net/"
+		},
+		"ls_databricks_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0618-152343-8hm64pko"
 		},
 		"ls_key_vault_properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -76,6 +84,9 @@
 					"ls_adls_accountKey": {
 						"value": "[parameters('ls_adls_accountKey')]"
 					},
+					"ls_databricks_accessToken": {
+						"value": "[parameters('ls_databricks_accessToken')]"
+					},
 					"ls_sql_db_password": {
 						"value": "[parameters('ls_sql_db_password')]"
 					},
@@ -84,6 +95,9 @@
 					},
 					"ls_adls_properties_typeProperties_url": {
 						"value": "[parameters('ls_adls_properties_typeProperties_url')]"
+					},
+					"ls_databricks_properties_typeProperties_existingClusterId": {
+						"value": "[parameters('ls_databricks_properties_typeProperties_existingClusterId')]"
 					},
 					"ls_key_vault_properties_typeProperties_baseUrl": {
 						"value": "[parameters('ls_key_vault_properties_typeProperties_baseUrl')]"
