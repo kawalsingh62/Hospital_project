@@ -1,0 +1,12 @@
+{
+	"name": "ls_databricks",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-7405617679170253.13.azuredatabricks.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/a81e9a7d-3af2-4e98-9dc5-9a63178a25a2/resourceGroups/hospital/providers/Microsoft.Databricks/workspaces/hosptitaldatab"
+		}
+	}
+}
