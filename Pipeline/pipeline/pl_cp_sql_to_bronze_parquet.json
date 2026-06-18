@@ -398,7 +398,7 @@
 											"source": {
 												"type": "AzureSqlSource",
 												"sqlReaderQuery": {
-													"value": "@concat(\n        'SELECT * ,',\n        '''',\n        item().datasource,\n        ' AS datasource ',\n        '''',\n        'FROM ',\n        item().hosp_schema,'.', item().tablename\n)",
+													"value": "@concat(\n        'SELECT * ,',\n        '''',\n        item().datasource,\n        '''',\n        ' AS datasource FROM ',\n        item().hosp_schema,'.', item().tablename\n)",
 													"type": "Expression"
 												},
 												"queryTimeout": "02:00:00",
