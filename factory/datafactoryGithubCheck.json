@@ -1,0 +1,15 @@
+{
+	"name": "datafactoryGithubCheck",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "centralus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "a277b17e-d658-4383-8341-de6ba49dca2c",
+		"tenantId": "b97d8520-4256-4533-ab13-d9120efde0b1"
+	}
+}
