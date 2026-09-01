@@ -1,0 +1,15 @@
+{
+	"name": "naukridatafactory",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "7fea9614-fd01-4a77-9f94-3adfb7a1fbb3",
+		"tenantId": "8c672d9c-e9e7-4857-8941-c056e2d796fa"
+	}
+}
